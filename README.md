@@ -1,54 +1,56 @@
 # Simulador de Emissão de NFS-e
 
-API que simula o ciclo de emissão de uma nota fiscal de serviço eletrônica.
-PostgreSQL guarda dados fixos de cadastro (cliente). MongoDB guarda o
-histórico de emissões, porque o retorno de cada tentativa (autorizada,
-rejeitada, denegada) tem um formato de dados diferente.
+API que simula o ciclo de emissão de uma Nota Fiscal de Serviço Eletrônica (NFS-e), construída para explorar, na prática, o tipo de problema de integração fiscal enfrentado por empresas do setor.
 
----
+## Motivação
 
-## Passo a passo para rodar HOJE
+Diferente da NF-e (padronizada nacionalmente via SEFAZ), a NFS-e é regulada por cada município, o que gera fragmentação de layouts e formatos de retorno. Este projeto simula esse comportamento: cada tentativa de emissão pode retornar em um formato diferente, dependendo do status (autorizada, rejeitada, denegada, cancelada).
 
-### 1. Pré-requisitos
-- Node.js instalado (versão 18+) — verifique com `node -v` no terminal
-- PostgreSQL instalado e rodando (você já tem isso da Vendas API)
-- Uma conta gratuita no MongoDB Atlas (mongodb.com/cloud/atlas) — mais rápido
-  que instalar Mongo localmente hoje. Crie um cluster gratuito (M0) e pegue
-  a connection string em "Connect" → "Drivers".
+## Stack e arquitetura
 
-### 2. Instalar as dependências
-No terminal, dentro da pasta do projeto:
+- **Node.js + TypeScript** — API REST com Express
+- **PostgreSQL** — armazena dados estruturados e fixos (cadastro de clientes/emitentes)
+- **MongoDB** — armazena o histórico de emissões, já que cada status retorna campos diferentes (uma autorização tem `protocolo`; uma rejeição tem `codigoErro` e `motivo`). Modelar isso em tabelas relacionais geraria colunas majoritariamente vazias — um modelo de documento se encaixa melhor.
+
 ```
+src/
+  config/       conexões com Postgres e MongoDB
+  models/       acesso a dados (queries e schemas)
+  controllers/  regras de negócio de cada rota
+  routes/       definição dos endpoints
+  server.ts     ponto de entrada da aplicação
+```
+
+## Como rodar localmente
+
+**Pré-requisitos:** Node.js 18+, PostgreSQL, e uma instância MongoDB (local ou Atlas).
+
+```bash
 npm install
-```
-
-### 3. Configurar variáveis de ambiente
-Copie o arquivo `.env.example` e renomeie para `.env`. Preencha com:
-- Seus dados reais do PostgreSQL local (usuário, senha, nome do banco)
-- A connection string do MongoDB Atlas em `MONGO_URI`
-
-**Importante:** crie o banco `nfse_simulador` no seu PostgreSQL antes de rodar
-(pode usar o pgAdmin ou `CREATE DATABASE nfse_simulador;` no psql). A tabela
-dentro dele é criada automaticamente pelo código quando o servidor sobe.
-
-### 4. Rodar o servidor em modo desenvolvimento
-```
+cp .env.example .env   # preencha com suas credenciais
 npm run dev
 ```
-Se tudo estiver certo, você verá no terminal:
+
+O servidor sobe em `http://localhost:3000` e cria automaticamente a tabela `clientes` no PostgreSQL na primeira execução.
+
+## Endpoints
+
+**Clientes**
 ```
-[Postgres] Tabela "clientes" pronta.
-[MongoDB] Conectado.
-Servidor rodando em http://localhost:3000
+POST   /clientes        cria um cliente
+GET    /clientes        lista todos os clientes
+GET    /clientes/:id    busca cliente por id
 ```
 
-### 5. Testar os endpoints
-Use o Postman, Insomnia, ou até o `curl` direto no terminal.
-
-**Criar um cliente (vai pro Postgres):**
+**Emissões**
 ```
-POST http://localhost:3000/clientes
-Body (JSON):
+POST   /emissoes             simula a emissão de uma nota (status sorteado)
+GET    /emissoes/:clienteId  histórico de emissões de um cliente
+```
+
+Exemplo de criação de cliente:
+```json
+POST /clientes
 {
   "nome": "Empresa Teste LTDA",
   "cpf_cnpj": "12345678000199",
@@ -57,50 +59,17 @@ Body (JSON):
 }
 ```
 
-**Listar clientes:**
-```
-GET http://localhost:3000/clientes
-```
-
-**Emitir uma nota fictícia (vai pro Mongo, use o id do cliente criado acima):**
-```
-POST http://localhost:3000/emissoes
-Body (JSON):
+Exemplo de emissão:
+```json
+POST /emissoes
 {
   "clienteId": 1,
   "valor": 1500.00
 }
 ```
-Rode esse endpoint várias vezes — como o retorno é sorteado, você vai ver
-notas autorizadas, rejeitadas e denegadas, cada uma com detalhes diferentes.
 
-**Ver o histórico de emissões de um cliente:**
-```
-GET http://localhost:3000/emissoes/1
-```
+## Próximos passos
 
----
-
-## Por que as escolhas técnicas foram essas
-(isso é o que você precisa saber de cor pra defender o projeto numa conversa)
-
-- **PostgreSQL para clientes:** dado fixo, estruturado, que precisa de
-  integridade (CPF/CNPJ único, por exemplo). Relacional é o modelo certo aqui.
-- **MongoDB para emissões:** cada emissão pode ter um formato de retorno
-  diferente dependendo do status. Uma rejeição tem `codigoErro` e `motivo`;
-  uma autorização tem `protocolo`. Modelar isso em tabelas relacionais geraria
-  colunas vazias ou tabelas extras desnecessárias — documento resolve melhor.
-- **TypeScript:** tipagem ajuda a pegar erro antes de rodar (ex: esquecer um
-  campo obrigatório), o que importa bastante num sistema fiscal onde erro
-  de dado tem consequência real.
-- **Camadas separadas (routes/controllers/models):** mesmo padrão usado no
-  Spring Boot (controller/service/repository) — mantém o código organizado
-  e fácil de testar.
-
----
-
-## Próximos passos (depois de rodar hoje)
-1. Subir esse repositório no GitHub com esse README
-2. Adicionar validação mais robusta (ex: validar formato de CPF/CNPJ)
-3. Construir a tela Delphi de cadastro de cliente, conectada nesse mesmo Postgres
-4. Documentar no README o fluxo completo com um diagrama simples
+- Validação de formato de CPF/CNPJ
+- Interface desktop em Delphi para cadastro de clientes, conectada ao mesmo banco PostgreSQL
+- Diagrama de arquitetura no README
