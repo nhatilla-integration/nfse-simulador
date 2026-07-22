@@ -1,4 +1,4 @@
-{
+﻿{
   "name": "nfse-simulador",
   "version": "1.0.0",
   "description": "Simulador de emissao de NFS-e - API Node.js + TypeScript + PostgreSQL + MongoDB",
@@ -31,3 +31,4 @@
     "typescript": "^5.5.3"
   }
 }
+
