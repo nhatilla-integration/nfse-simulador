@@ -5,6 +5,7 @@ import { initPostgres } from './config/postgres';
 import { connectMongo } from './config/mongo';
 import clienteRoutes from './routes/cliente.routes';
 import emissaoRoutes from './routes/emissao.routes';
+import { errorHandler } from './middlewares/errorHandler';
 
 dotenv.config();
 
@@ -18,6 +19,11 @@ app.use('/emissoes', emissaoRoutes);
 app.get('/', (req, res) => {
   res.json({ status: 'API do simulador de NFS-e no ar' });
 });
+
+// O middleware de erros precisa ser registrado por ultimo, depois
+// de todas as rotas. E assim que o Express identifica que essa
+// funcao (com 4 parametros) deve tratar erros da aplicacao inteira.
+app.use(errorHandler);
 
 const PORT = process.env.PORT || 3000;
 

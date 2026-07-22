@@ -1,14 +1,6 @@
 import { buscarClientePorId } from '../models/cliente.model';
 import { Emissao } from '../models/emissao.model';
-
-// Erro de dominio: permite que o Controller decida o status HTTP
-// certo sem precisar conhecer detalhes da regra de negocio.
-export class ClienteNaoEncontradoError extends Error {
-  constructor() {
-    super('Cliente nao cadastrado');
-    this.name = 'ClienteNaoEncontradoError';
-  }
-}
+import { NotFoundError } from '../errors/AppError';
 
 interface RetornoFiscal {
   status: 'autorizada' | 'rejeitada' | 'denegada';
@@ -51,7 +43,7 @@ export const EmissaoService = {
     // Antes de emitir, confirma que o cliente existe no Postgres.
     const cliente = await buscarClientePorId(clienteId);
     if (!cliente) {
-      throw new ClienteNaoEncontradoError();
+      throw new NotFoundError('Cliente nao cadastrado');
     }
 
     const resultado = simularRetornoFiscal();
