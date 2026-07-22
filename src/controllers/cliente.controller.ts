@@ -4,11 +4,6 @@ import { criarCliente, listarClientes, buscarClientePorId } from '../models/clie
 export async function postCliente(req: Request, res: Response) {
   try {
     const { nome, cpf_cnpj, email, cidade } = req.body;
-
-    if (!nome || !cpf_cnpj) {
-      return res.status(400).json({ erro: 'nome e cpf_cnpj sao obrigatorios' });
-    }
-
     const novoCliente = await criarCliente({ nome, cpf_cnpj, email, cidade });
     return res.status(201).json(novoCliente);
   } catch (erro) {

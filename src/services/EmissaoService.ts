@@ -1,19 +1,12 @@
 import { buscarClientePorId } from '../models/cliente.model';
 import { Emissao } from '../models/emissao.model';
 
-// Erros de domínio: permitem que o Controller decida o status HTTP
-// certo sem precisar conhecer detalhes da regra de negócio.
+// Erro de dominio: permite que o Controller decida o status HTTP
+// certo sem precisar conhecer detalhes da regra de negocio.
 export class ClienteNaoEncontradoError extends Error {
   constructor() {
     super('Cliente nao cadastrado');
     this.name = 'ClienteNaoEncontradoError';
-  }
-}
-
-export class DadosInvalidosError extends Error {
-  constructor(mensagem: string) {
-    super(mensagem);
-    this.name = 'DadosInvalidosError';
   }
 }
 
@@ -51,12 +44,12 @@ interface EmitirNotaInput {
 
 export const EmissaoService = {
   async emitir({ clienteId, valor }: EmitirNotaInput) {
-    if (!clienteId || !valor) {
-      throw new DadosInvalidosError('clienteId e valor sao obrigatorios');
-    }
+    // clienteId e valor ja chegam validados aqui: o middleware de
+    // validacao (Zod), aplicado na rota, garante tipo e presenca
+    // antes da requisicao chegar ao Controller.
 
     // Antes de emitir, confirma que o cliente existe no Postgres.
-    const cliente = await buscarClientePorId(Number(clienteId));
+    const cliente = await buscarClientePorId(clienteId);
     if (!cliente) {
       throw new ClienteNaoEncontradoError();
     }

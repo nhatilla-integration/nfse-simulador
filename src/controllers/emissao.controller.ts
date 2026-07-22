@@ -1,9 +1,5 @@
 import { Request, Response } from 'express';
-import {
-  EmissaoService,
-  ClienteNaoEncontradoError,
-  DadosInvalidosError,
-} from '../services/EmissaoService';
+import { EmissaoService, ClienteNaoEncontradoError } from '../services/EmissaoService';
 
 export async function postEmissao(req: Request, res: Response) {
   try {
@@ -11,9 +7,6 @@ export async function postEmissao(req: Request, res: Response) {
     const emissao = await EmissaoService.emitir({ clienteId, valor });
     return res.status(201).json(emissao);
   } catch (erro) {
-    if (erro instanceof DadosInvalidosError) {
-      return res.status(400).json({ erro: erro.message });
-    }
     if (erro instanceof ClienteNaoEncontradoError) {
       return res.status(404).json({ erro: erro.message });
     }
