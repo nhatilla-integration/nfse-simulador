@@ -28,6 +28,44 @@ export const swaggerSpec = {
         },
       },
     },
+    '/health': {
+      get: {
+        summary: 'Verifica a saude da API e das conexoes com Postgres/MongoDB',
+        tags: ['Health'],
+        responses: {
+          '200': {
+            description: 'API e bancos de dados operacionais',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'UP' },
+                    postgres: { type: 'string', example: 'connected' },
+                    mongodb: { type: 'string', example: 'connected' },
+                  },
+                },
+              },
+            },
+          },
+          '503': {
+            description: 'Algum banco de dados esta indisponivel',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    status: { type: 'string', example: 'DOWN' },
+                    postgres: { type: 'string', example: 'connected' },
+                    mongodb: { type: 'string', example: 'disconnected' },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    },
     '/clientes': {
       post: {
         summary: 'Cria um novo cliente',
