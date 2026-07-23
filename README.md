@@ -18,13 +18,13 @@ Diferente da NF-e (padronizada nacionalmente via SEFAZ), a NFS-e é regulada por
 
 Este projeto foi desenvolvido para praticar conceitos encontrados em integrações fiscais reais, incluindo:
 
-- Arquitetura REST
-- Integração entre bancos SQL e NoSQL
-- Modelagem de dados híbrida
-- Organização em camadas
-- Simulação de regras de negócio
+- Desenvolvimento de API REST
+- Integração entre PostgreSQL e MongoDB
+- Arquitetura em camadas
+- Modelagem híbrida SQL/NoSQL
+- Simulação de integração fiscal
 - Persistência de histórico
-- APIs escaláveis
+- Organização de código utilizando Controllers, Services e Models
 
 ## Arquitetura
 
