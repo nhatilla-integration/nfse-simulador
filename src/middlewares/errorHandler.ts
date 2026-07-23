@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { AppError } from '../errors/AppError';
+import { logger } from '../config/logger';
 
 // Middleware global: centraliza a traducao de erros em respostas
 // HTTP. Nenhum Controller precisa mais decidir "esse erro e um
@@ -17,6 +18,6 @@ export function errorHandler(
     return res.status(erro.status).json({ erro: erro.message });
   }
 
-  console.error(erro);
+  logger.error(erro);
   return res.status(500).json({ erro: 'Erro interno do servidor' });
 }

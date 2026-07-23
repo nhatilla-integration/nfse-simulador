@@ -1,5 +1,6 @@
 import { Pool } from 'pg';
 import dotenv from 'dotenv';
+import { logger } from './logger';
 
 dotenv.config();
 
@@ -27,5 +28,5 @@ export async function initPostgres() {
     );
   `;
   await pgPool.query(query);
-  console.log('[Postgres] Tabela "clientes" pronta.');
+  logger.info('[Postgres] Tabela "clientes" pronta.');
 }
