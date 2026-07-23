@@ -9,6 +9,8 @@ services:
         value: 3000
       - key: LOG_LEVEL
         value: info
+      - key: PG_SSL
+        value: true
       - key: PG_HOST
         sync: false
       - key: PG_PORT

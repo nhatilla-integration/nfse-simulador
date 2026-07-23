@@ -12,6 +12,9 @@ export const pgPool = new Pool({
   user: process.env.PG_USER,
   password: process.env.PG_PASSWORD,
   database: process.env.PG_DATABASE,
+  // Neon (e a maioria dos Postgres gerenciados na nuvem) exige SSL.
+  // Postgres local geralmente nao tem SSL configurado, por isso e opcional.
+  ssl: process.env.PG_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
 });
 
 // Cria a tabela de clientes se ela ainda nao existir.
