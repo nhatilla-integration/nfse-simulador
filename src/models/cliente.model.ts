@@ -1,4 +1,5 @@
 import { pgPool } from '../config/postgres';
+import { ConflictError } from '../errors/AppError';
 
 // Este arquivo concentra todas as queries relacionadas a "clientes".
 // Separar assim (camada de acesso a dados) facilita testar e trocar
@@ -19,8 +20,17 @@ export async function criarCliente(cliente: Cliente) {
     RETURNING *;
   `;
   const values = [cliente.nome, cliente.cpf_cnpj, cliente.email, cliente.cidade];
-  const result = await pgPool.query(query, values);
-  return result.rows[0];
+
+  try {
+    const result = await pgPool.query(query, values);
+    return result.rows[0];
+  } catch (erro) {
+    // Codigo 23505 = unique_violation no Postgres.
+    if ((erro as { code?: string }).code === '23505') {
+      throw new ConflictError('CPF/CNPJ ja cadastrado');
+    }
+    throw erro;
+  }
 }
 
 export async function listarClientes() {

@@ -24,3 +24,9 @@ export class BadRequestError extends AppError {
     super(message, 400);
   }
 }
+
+export class ConflictError extends AppError {
+  constructor(message = 'Conflito com um recurso existente') {
+    super(message, 409);
+  }
+}
