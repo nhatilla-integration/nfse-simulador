@@ -4,6 +4,7 @@
 ![Express](https://img.shields.io/badge/Express-000000?style=flat&logo=express&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=flat&logo=postgresql&logoColor=white)
 ![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=flat&logo=mongodb&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)
 
 API que simula o ciclo de emissão de uma Nota Fiscal de Serviço Eletrônica (NFS-e), construída para explorar, na prática, o tipo de problema de integração fiscal enfrentado por empresas do setor.
 
@@ -111,6 +112,7 @@ http://localhost:3000/docs
 
 ```
 GET    /ping     verifica se a API esta no ar
+GET    /health   verifica a saude da API e das conexoes com Postgres/MongoDB
 ```
 
 **Clientes**
